@@ -1,0 +1,36 @@
+buildscript {
+    repositories {
+        google()
+        jcenter()
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:7.4.2'
+    }
+}
+
+repositories {
+    google()
+    jcenter()
+}
+apply plugin: 'com.android.application'
+
+android {
+    compileSdkVersion 34
+    defaultConfig {
+        def pApplicationId = project.findProperty("applicationId") ?: "com.github.arkty.thrower"
+        def pVersionCode = project.findProperty("versionCode")?.toInteger() ?: 1
+        def pVersionName = project.findProperty("versionName") ?: "1.0"
+
+        applicationId pApplicationId
+        namespace "com.github.arkty.thrower"
+        targetSdkVersion 34
+        versionCode pVersionCode
+        versionName pVersionName
+        resValue "string", "app_name", pApplicationId
+    }
+    applicationVariants.configureEach { variant ->
+        variant.outputs.configureEach {
+            outputFileName = "../../../../${variant.applicationId}-${variant.versionName}(${variant.versionCode}).apk"
+        }
+    }
+}
