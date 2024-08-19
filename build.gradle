@@ -1,3 +1,6 @@
+import java.io.RandomAccessFile
+import java.util.Random
+
 buildscript {
     repositories {
         google()
@@ -33,4 +36,34 @@ android {
             outputFileName = "../../../../${variant.applicationId}-${variant.versionName}(${variant.versionCode}).apk"
         }
     }
+    aaptOptions {
+        noCompress 'bin'
+    }
 }
+
+task setApkSize {
+    Directory projectDirectory = layout.projectDirectory
+
+    def pApkSizeMb = project.findProperty("apkSizeMb")?.toInteger() ?:0
+
+    doLast {
+
+        def srcDir = projectDirectory.file('src/main/assets/').asFile
+        println("File size = " + pApkSizeMb)
+        try (FileOutputStream os = new FileOutputStream(new File(srcDir, "big_file.bin"))) {
+            def r = new Random()
+            for (int i = 0; i < pApkSizeMb; i++) {
+                def bytes = new byte[1024 * 1024]
+                r.nextBytes(bytes)
+                os.write(bytes)
+            }
+        }
+    }
+}
+
+// Doesn't work as expected
+//tasks.whenTaskAdded { task ->
+//    if (task.name == 'assembleDebug') {
+//        task.dependsOn setApkSize
+//    }
+//}
